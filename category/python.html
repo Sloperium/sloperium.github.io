@@ -21,13 +21,17 @@
         <abbr class="published" title="2018-11-16T00:00:00+01:00">
                 Published: fre. 16 november 2018
         </abbr>
+		<br />
+        <abbr class="modified" title="2018-11-16T00:00:00+01:00">
+                Updated: fre. 16 november 2018
+        </abbr>
 
         <address class="vcard author">
                 By                         <a class="url fn" href="/author/john-erik-sloper.html">John Erik Sloper</a>
         </address>
 <p>In <a href="/category/python.html">Python</a>.</p>
 <p>tags: <a href="/tag/python.html">python</a> <a href="/tag/cython.html">cython</a> <a href="/tag/performance.html">performance</a> </p>
-</footer><!-- /.post-info --><p>In this post I will look at <a href="http://cython.org/">cython</a> for speeding up python code. This is my first attempt at using cython so please bear with me.</p>
+</footer><!-- /.post-info --><p>In this post I will look at <a href="http://cython.org">cython</a> for speeding up python code. This is my first attempt at using cython so please bear with me.</p>
 <h3>Installation</h3>
 <p>Cython itself can be installed straight forward with pip:</p>
 <div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">cython</span>
@@ -35,7 +39,7 @@
 
 
 <p>In order to compile the python code to c you will need a c compiler. Depending on your platform you will already have one (e.g. gcc on linux). As I am on a windows environment I can just mingw or one of the visual studio compilers. I chose to use mingw in this case.</p>
-<p>You can download mingw from this link (https://sourceforge.net/projects/mingw/files/). When installing it is enough to choose the mingw32-base option.</p>
+<p>You can download mingw from this link: <a href="https://sourceforge.net/projects/mingw/files/">https://sourceforge.net/projects/mingw/files/</a>. When installing it is enough to choose the mingw32-base option.</p>
 <p>After installing we need to add the mingw/bin folder to the path.</p>
 <p>We also need to add distutils.cfg file in our python environment base path. In my case that is located at:</p>
 <div class="highlight"><pre><span></span>C:\Users\\AppData\Local\Programs\Python\Python36
@@ -53,7 +57,7 @@
 
 <p>We are now ready to start using cython!</p>
 <h3>Let's have a look at performance</h3>
-<p>As an example I will look at two of implementations of the fibonacci sequences from the post <a href="https://sloperium.wordpress.com/2018/08/18/calculating-the-last-digits-of-large-fibonacci-numbers/">Calculating the last digits of large fibonacci numbers</a></p>
+<p>As an example I will look at two of the implementations of the fibonacci sequences from the post <a href="https://sloperium.wordpress.com/2018/08/18/calculating-the-last-digits-of-large-fibonacci-numbers/">Calculating the last digits of large fibonacci numbers</a>. Calculating the last digits of large fibonacci numbers</a></p>
 <p><em>It is worth noting that the fibonacci numbers are perhaps not the best example, both in terms of code, but also as one would have to take extreme care when dealing with larger numbers where integer overflows and the like becomes a real issue.</em></p>
 <p>Let's first take the implementations of the fibonacci sequence and store them in <code>fibonacci_py.py</code>.</p>
 <div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">fib1</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
