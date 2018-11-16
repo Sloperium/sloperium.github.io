@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <title>Sloperium - Project Euler</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">Sloperium </a></h1>
+                <nav><ul>
+                    <li><a href="/category/blogposts.html">Blogposts</a></li>
+                    <li><a href="/category/python.html">Python</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+
+            <aside id="featured" class="body">
+                <article>
+                    <h1 class="entry-title"><a href="/project-euler-1.html">Project Euler #1</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2018-09-07T00:00:00+02:00">
+                Published: Fri 07 September 2018
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/christian-sloper.html">Christian Sloper</a>
+        </address>
+<p>In <a href="/category/python.html">Python</a>.</p>
+<p>tags: <a href="/tag/python.html">python</a> <a href="/tag/project-euler.html">Project Euler</a> </p>
+</footer><!-- /.post-info --><p>The math/programming puzzles page "<a href="https://projecteuler.net/about">Project Euler</a>" have for many years been a hobby of mine. I want to share some solutions for simpler and harder problems and in the process highlight some techniques applicable in algorithm design.  Hopefully these posts will also teach me how to a) blog and b) use wordpress.</p>
+<p>To get things started we will look at "<a href="https://projecteuler.net/problem=1">Project Euler , problem 1</a>".
+<blockquote>If we list all the natural numbers below 10 that are multiples of 3 or 5, we get 3, 5, 6 and 9. The sum of these multiples is 23.</p>
+<p>Find the sum of all the multiples of 3 or 5 below 1000.</blockquote></p>
+<h2>Brute force programming</h2>
+<p>With any sort of programming background this task is very easy, in python we could write:</p>
+<div class="highlight"><pre><span></span><span class="n">s</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+   <span class="k">if</span> <span class="n">i</span><span class="o">%</span><span class="mi">3</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">i</span><span class="o">%</span><span class="mi">5</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+   <span class="n">s</span> <span class="o">+=</span><span class="n">i</span>
+<span class="k">print</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+</pre></div>
+
+
+<p>For a python user there is a more "pythonic" way using list comprehension:</p>
+<div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span> <span class="nb">sum</span><span class="p">(</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span><span class="o">%</span><span class="mi">3</span><span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">i</span><span class="o">%</span><span class="mi">5</span><span class="o">==</span> <span class="mi">0</span> <span class="p">))</span>
+</pre></div>
+
+
+<p>both yielding the result 233168.</p>
+<h2>The math</h2>
+<p>The above solution works very well for puzzle 1, as it is only 2000 or so "if" tests, but what if we dont want the sum of numbers below 1000 but numbers below 1 trillion? ( 1 000 000 000 000 ) 2 trillion if tests would take an enormous amount of time to calculate, but using some analysis we can avoid the for loop all together.</p>
+<p>We will view the numbers divisible by 3 as one set, and the numbers divisible by 5 as another set. The sum of the first set <span class="math">\(3, 6, 9, 12, 15, ..., \left \lfloor{n/3} \right \rfloor\)</span>  can be expressed like this <span class="math">\(\sum_{i=1}^{\left \lfloor{n/3} \right \rfloor } 3*i\)</span></p>
+<p>The second set <span class="math">\(5, 10, 15, 20, 25, ..., \left \lfloor{n/5} \right \rfloor\)</span> can be expressed similarly <span class="math">\(\sum_{i=1}^{\left \lfloor{n/5} \right \rfloor } 5*i\)</span></p>
+<p>We can add the sum of two sets together if there is no overlap, but we notice that every 15th number is divisble by both 3 and 5. To account for this we must subtract the sum: <span class="math">\(\sum_{i=1}^{\left \lfloor{n/15} \right \rfloor } 15*i\)</span>.  This is known as <a href="https://en.wikipedia.org/wiki/Inclusion%E2%80%93exclusion_principle">the inclusion/exclusion principle</a>.</p>
+<p>Using the identity <span class="math">\(\sum_{i=1}^{n} i = \frac{n*(n+1)}{2}\)</span> we can write a function to calculate each term:</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">SumDivisibleByN</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">m</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">n</span> <span class="o">*</span> <span class="p">(</span><span class="n">m</span> <span class="o">//</span> <span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">m</span> <span class="o">//</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">SumdivisbleByN</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">999</span><span class="p">)</span> <span class="o">+</span> <span class="n">SumdivisbleByN</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">999</span><span class="p">)</span> <span class="o">-</span> <span class="n">SumdivisbleByN</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">999</span><span class="p">))</span>
+</pre></div>
+
+
+<p>which yields the same result, and also allows for much higher input numbers, one trillion f.ex. :</p>
+<div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="n">SumdivisbleByN</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">10</span><span class="o">**</span><span class="mi">12</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">SumdivisbleByN</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="o">**</span><span class="mi">12</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">SumdivisbleByN</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">10</span><span class="o">**</span><span class="mi">12</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+</pre></div>
+
+
+<p>yields 233333333333166666666668 in an instant.</p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>                </article>
+            </aside><!-- /#featured -->
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="http://jinja.pocoo.org/">Jinja2</a></li>
+                            <li><a href="#">You can modify those links in your config file</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="#">You can add links in your config file</a></li>
+                            <li><a href="#">Another social link</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>
