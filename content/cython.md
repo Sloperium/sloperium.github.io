@@ -1,11 +1,12 @@
 Title: First look: Performance and cython
-Date: 2018-11-16 
+Date: 2018-11-16
+Modified: 2018-11-16 
 Category: Python
 Tags: python, cython, performance
 Authors: John Erik Sloper
 Summary: First attempt at using cython to improve performance
 
-In this post I will look at <a href="http://cython.org/">cython</a> for speeding up python code. This is my first attempt at using cython so please bear with me.
+In this post I will look at [cython](http://cython.org) for speeding up python code. This is my first attempt at using cython so please bear with me.
 
 ### Installation
 
@@ -16,7 +17,7 @@ Cython itself can be installed straight forward with pip:
 
 In order to compile the python code to c you will need a c compiler. Depending on your platform you will already have one (e.g. gcc on linux). As I am on a windows environment I can just mingw or one of the visual studio compilers. I chose to use mingw in this case.
 
-You can download mingw from this link (https://sourceforge.net/projects/mingw/files/). When installing it is enough to choose the mingw32-base option.
+You can download mingw from this link: [https://sourceforge.net/projects/mingw/files/](https://sourceforge.net/projects/mingw/files/). When installing it is enough to choose the mingw32-base option.
 
 After installing we need to add the mingw/bin folder to the path.
 
@@ -38,7 +39,7 @@ We are now ready to start using cython!
 
 ### Let's have a look at performance
 
-As an example I will look at two of implementations of the fibonacci sequences from the post <a href="https://sloperium.wordpress.com/2018/08/18/calculating-the-last-digits-of-large-fibonacci-numbers/">Calculating the last digits of large fibonacci numbers</a>
+As an example I will look at two of the implementations of the fibonacci sequences from the post [Calculating the last digits of large fibonacci numbers](https://sloperium.wordpress.com/2018/08/18/calculating-the-last-digits-of-large-fibonacci-numbers/). Calculating the last digits of large fibonacci numbers</a>
 
 *It is worth noting that the fibonacci numbers are perhaps not the best example, both in terms of code, but also as one would have to take extreme care when dealing with larger numbers where integer overflows and the like becomes a real issue.*
 
