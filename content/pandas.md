@@ -2,7 +2,6 @@ Title: Speeding up rolling pandas
 Date: 2018-11-16 
 Category: Python
 Tags: python, pandas
-Slug: my-super-post
 Authors: John Erik Sloper
 Summary: Using numpy to speed up pandas rolling
 
