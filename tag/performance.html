@@ -10,7 +10,6 @@
         <header id="banner" class="body">
                 <h1><a href="/">Sloperium </a></h1>
                 <nav><ul>
-                    <li><a href="/category/blogposts.html">Blogposts</a></li>
                     <li><a href="/category/python.html">Python</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
@@ -19,8 +18,8 @@
                 <article>
                     <h1 class="entry-title"><a href="/first-look-performance-and-cython.html">First look: Performance and cython</a></h1>
 <footer class="post-info">
-        <abbr class="published" title="2018-11-16T00:00:00+01:00">
-                Published: Fri 16 November 2018
+        <abbr class="published" title="2018-08-21T00:00:00+02:00">
+                Published: Tue 21 August 2018
         </abbr>
 		<br />
         <abbr class="modified" title="2018-11-16T00:00:00+01:00">
@@ -62,7 +61,7 @@
 <p><em>It is worth noting that the fibonacci numbers are perhaps not the best example, both in terms of code, but also as one would have to take extreme care when dealing with larger numbers where integer overflows and the like becomes a real issue.</em></p>
 <p>Let's first take the implementations of the fibonacci sequence and store them in <code>fibonacci_py.py</code>.</p>
 <div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">fib1</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">=</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">n</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">fib1</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">fib1</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
@@ -128,7 +127,7 @@
 <p><img alt="cy_vs_py" src="/images/cy_vs_py.png"></p>
 <p>We have more than 2x speed up without changing any code at all. Let's help the cython compiler out by providing some type information in fibonacci_cy.py:</p>
 <div class="highlight"><pre><span></span><span class="n">cpdef</span> <span class="nb">int</span> <span class="n">fib1</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">=</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">n</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">fib1</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">fib1</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
@@ -139,7 +138,7 @@
 <p><img alt="cy_vs_py_return" src="/images/cy_vs_py_return.png"></p>
 <p>So just by specifying the return type we get a speedup of 5x. Not much more to do here, but we can also specify which type n has:</p>
 <div class="highlight"><pre><span></span><span class="n">cpdef</span> <span class="nb">int</span> <span class="n">fib1</span><span class="p">(</span><span class="nb">int</span> <span class="n">n</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">=</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">n</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">fib1</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">fib1</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>

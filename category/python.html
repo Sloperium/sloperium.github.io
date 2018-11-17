@@ -10,197 +10,13 @@
         <header id="banner" class="body">
                 <h1><a href="/">Sloperium </a></h1>
                 <nav><ul>
-                    <li><a href="/category/blogposts.html">Blogposts</a></li>
                     <li class="active"><a href="/category/python.html">Python</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/first-look-performance-and-cython.html">First look: Performance and cython</a></h1>
-<footer class="post-info">
-        <abbr class="published" title="2018-11-16T00:00:00+01:00">
-                Published: Fri 16 November 2018
-        </abbr>
-		<br />
-        <abbr class="modified" title="2018-11-16T00:00:00+01:00">
-                Updated: Fri 16 November 2018
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/john-erik-sloper.html">John Erik Sloper</a>
-        </address>
-<p>In <a href="/category/python.html">Python</a>.</p>
-<p>tags: <a href="/tag/python.html">python</a> <a href="/tag/cython.html">cython</a> <a href="/tag/performance.html">performance</a> </p>
-</footer><!-- /.post-info --><p>In this post I will look at <a href="http://cython.org">cython</a> for speeding up python code. This is my first attempt at using cython so please bear with me.</p>
-<h3>Installation</h3>
-<p>Cython itself can be installed straight forward with pip:</p>
-<div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">cython</span>
-</pre></div>
-
-
-<p>In order to compile the python code to c you will need a c compiler. Depending on your platform you will already have one (e.g. gcc on linux). As I am on a windows environment I can just mingw or one of the visual studio compilers. I chose to use mingw in this case.</p>
-<p>You can download mingw from this link: <a href="https://sourceforge.net/projects/mingw/files/">https://sourceforge.net/projects/mingw/files/</a>. When installing it is enough to choose the mingw32-base option.</p>
-<p>After installing we need to add the mingw/bin folder to the path.</p>
-<p>We also need to add distutils.cfg file in our python environment base path. In my case that is located at:</p>
-<div class="highlight"><pre><span></span>C:\Users\\AppData\Local\Programs\Python\Python36
-</pre></div>
-
-
-<p>As content to the file we will add:</p>
-<div class="highlight"><pre><span></span><span class="k">[build]</span>
-<span class="na">compiler</span> <span class="o">=</span> <span class="s">mingw32</span>
-
-<span class="k">[build_ext]</span>
-<span class="na">compiler</span> <span class="o">=</span> <span class="s">mingw32</span>
-</pre></div>
-
-
-<p>We are now ready to start using cython!</p>
-<h3>Let's have a look at performance</h3>
-<p>As an example I will look at two of the implementations of the fibonacci sequences from the post <a href="https://sloperium.wordpress.com/2018/08/18/calculating-the-last-digits-of-large-fibonacci-numbers/">Calculating the last digits of large fibonacci numbers</a>. Calculating the last digits of large fibonacci numbers</a></p>
-<p><em>It is worth noting that the fibonacci numbers are perhaps not the best example, both in terms of code, but also as one would have to take extreme care when dealing with larger numbers where integer overflows and the like becomes a real issue.</em></p>
-<p>Let's first take the implementations of the fibonacci sequence and store them in <code>fibonacci_py.py</code>.</p>
-<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">fib1</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">n</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">fib1</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">fib1</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">fib3</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="mi">0</span>
-    <span class="n">f1</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">f2</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
-        <span class="n">f1</span><span class="p">,</span> <span class="n">f2</span> <span class="o">=</span> <span class="n">f2</span><span class="p">,</span> <span class="p">(</span><span class="n">f1</span> <span class="o">+</span> <span class="n">f2</span><span class="p">)</span>
-
-<span class="k">return</span> <span class="n">f2</span>
-</pre></div>
-
-
-<p>Let's set up a small test script that we will reuse later to time the various implementations:</p>
-<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">timeit</span>
-
-<span class="n">fib1</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">timeit</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="s1">&#39;fibonacci_py.fib1(30)&#39;</span><span class="p">,</span> <span class="n">setup</span><span class="o">=</span><span class="s1">&#39;import fibonacci_py&#39;</span><span class="p">,</span> <span class="n">repeat</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">number</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
-<span class="n">fib3</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">timeit</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="s1">&#39;fibonacci_py.fib3(30)&#39;</span><span class="p">,</span> <span class="n">setup</span><span class="o">=</span><span class="s1">&#39;import fibonacci_py&#39;</span><span class="p">,</span> <span class="n">repeat</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">number</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
-
-<span class="n">base</span> <span class="o">=</span> <span class="n">fib1</span>
-
-<span class="k">print</span><span class="p">(</span><span class="s2">&quot;Function         </span><span class="se">\t</span><span class="s2"> Speedup&quot;</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="s2">&quot;fib1 (naïve)     </span><span class="se">\t</span><span class="s2"> {0:f}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">base</span> <span class="o">/</span> <span class="n">fib1</span><span class="p">))</span>
-<span class="k">print</span><span class="p">(</span><span class="s2">&quot;fib3 (linear)    </span><span class="se">\t</span><span class="s2"> {0:f}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">base</span> <span class="o">/</span> <span class="n">fib3</span><span class="p">))</span>
-</pre></div>
-
-
-<p>This outputs:</p>
-<p><img alt="naive_vs_linear" src="/images/naive_vs_linear.png"></p>
-<p>Let's just say, the linear version is faster.</p>
-<p>Ona side note, the sub-linear version mentioned in the previous post is <em>much</em> faster for large fibonacci numbers:</p>
-<p><img alt="test.py_output_sub" src="/images/test-py_output_sub.png"></p>
-<h1>Making use of cython&lt;</h1>
-<p>On of the great things about cython is that you can start of with regular python code and iteratively add more and more type information and write more c-like code as you go.</p>
-<p>Let's start by taking the code exactly like it is of the fib1 function and saving it in a file called <code>fibonacci_cy.pyx</code>.</p>
-<p>In order to build the c-code we will create a <code>setup.py</code> file and add the following:</p>
-<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">distutils.core</span> <span class="kn">import</span> <span class="n">setup</span>
-<span class="kn">from</span> <span class="nn">Cython.Build</span> <span class="kn">import</span> <span class="n">cythonize</span>
-
-<span class="n">setup</span><span class="p">(</span><span class="n">ext_modules</span><span class="o">=</span><span class="p">(</span><span class="n">cythonize</span><span class="p">(</span><span class="s2">&quot;fibonacci_cy.pyx&quot;</span><span class="p">)))</span>
-</pre></div>
-
-
-<p>Now we can build it by executing <code>python setup.py build_ext --inline</code>. You will see a lot of output from the compiler and it will leave you with a file called something along the lines of <code>fibonacci_cy.cp36-win_amd64.pyd</code> (.so on linux). This file can be imported as normal in python using <code>import fibonacci_cy</code>.</p>
-<p>Let's setup a small test script again to test the performance. Let's call it test_cy_vs_py.py:</p>
-<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">timeit</span>
-
-<span class="n">fib1</span> <span class="o">=</span> <span class="n">timeit</span><span class="o">.</span><span class="n">timeit</span><span class="p">(</span><span class="s1">&#39;fibonacci_py.fib1(30)&#39;</span><span class="p">,</span> <span class="n">setup</span><span class="o">=</span><span class="s1">&#39;import fibonacci_py&#39;</span><span class="p">,</span> <span class="n">number</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
-<span class="n">fib1_cy</span> <span class="o">=</span> <span class="n">timeit</span><span class="o">.</span><span class="n">timeit</span><span class="p">(</span><span class="s1">&#39;fibonacci_cy.fib1(30)&#39;</span><span class="p">,</span> <span class="n">setup</span><span class="o">=</span><span class="s1">&#39;import fibonacci_cy&#39;</span><span class="p">,</span> <span class="n">number</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
-
-<span class="n">base</span> <span class="o">=</span> <span class="n">fib1</span>
-
-<span class="k">print</span><span class="p">(</span><span class="s2">&quot;Function</span><span class="se">\t</span><span class="s2"> Speedup&quot;</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="s2">&quot;fib1 (naïve)     </span><span class="se">\t</span><span class="s2"> {0:f}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">base</span> <span class="o">/</span> <span class="n">fib1</span><span class="p">))</span>
-<span class="k">print</span><span class="p">(</span><span class="s2">&quot;fib1_cy (naïve)  </span><span class="se">\t</span><span class="s2"> {0:f}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">base</span> <span class="o">/</span> <span class="n">fib1_cy</span><span class="p">))</span>
-</pre></div>
-
-
-<p>This outputs:</p>
-<p><img alt="cy_vs_py" src="/images/cy_vs_py.png"></p>
-<p>We have more than 2x speed up without changing any code at all. Let's help the cython compiler out by providing some type information in fibonacci_cy.py:</p>
-<div class="highlight"><pre><span></span><span class="n">cpdef</span> <span class="nb">int</span> <span class="n">fib1</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">n</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">fib1</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">fib1</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
-</pre></div>
-
-
-<p>We run the test again and get:</p>
-<p><img alt="cy_vs_py_return" src="/images/cy_vs_py_return.png"></p>
-<p>So just by specifying the return type we get a speedup of 5x. Not much more to do here, but we can also specify which type n has:</p>
-<div class="highlight"><pre><span></span><span class="n">cpdef</span> <span class="nb">int</span> <span class="n">fib1</span><span class="p">(</span><span class="nb">int</span> <span class="n">n</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">n</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">fib1</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">fib1</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
-</pre></div>
-
-
-<p><img alt="cy_vs_py_return_and_input" src="/images/cy_vs_py_return_and_input.png"></p>
-<p>So by adding just the return and input type we achieve a ~100x speed up. Not bad :)</p>
-<p>Doing the same exercise for the fib3 function we achieve ~20x speed up, by just defining type information:</p>
-<div class="highlight"><pre><span></span><span class="n">cpdef</span> <span class="nb">int</span> <span class="n">fib3</span><span class="p">(</span><span class="nb">int</span> <span class="n">n</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="mi">0</span>
-    <span class="n">cpdef</span> <span class="nb">int</span> <span class="n">f1</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">cpdef</span> <span class="nb">int</span> <span class="n">f2</span> <span class="o">=</span> <span class="mi">1</span>
-
-    <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
-        <span class="n">f1</span><span class="p">,</span> <span class="n">f2</span> <span class="o">=</span> <span class="n">f2</span><span class="p">,</span> <span class="p">(</span><span class="n">f1</span> <span class="o">+</span> <span class="n">f2</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">f2</span>
-</pre></div>
-
-
-<p>output:</p>
-<p><img alt="fib3" src="/images/fib3.png"></p>
-<p>That is it for now. I will post more on cython as I get a bit more experience with the tool and use it in real life applications.</p>
-<p><strong>Tip:</strong> you can pass annotate=True to the cythonize function in setup.py. This will produce an html file showing which lines are still using python code and which are converted to c-code. This is a great way to find which lines can still be optimized. More on this in a coming blog post.</p>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/speeding-up-rolling-pandas.html" rel="bookmark"
-                           title="Permalink to Speeding up rolling pandas">Speeding up rolling pandas</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2018-11-16T00:00:00+01:00">
-                Published: Fri 16 November 2018
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/john-erik-sloper.html">John Erik Sloper</a>
-        </address>
-<p>In <a href="/category/python.html">Python</a>.</p>
-<p>tags: <a href="/tag/python.html">python</a> <a href="/tag/pandas.html">pandas</a> </p>
-</footer><!-- /.post-info -->                <p>Using numpy to speed up pandas rolling</p>
-                <a class="readmore" href="/speeding-up-rolling-pandas.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/copy-directly-from-azure-blob-storage-to-azure-data-lake.html" rel="bookmark"
-                           title="Permalink to Copy directly from azure blob storage to azure data lake.">Copy directly from azure blob storage to azure data lake.</a></h1>
-                </header>
-
-                <div class="entry-content">
+                    <h1 class="entry-title"><a href="/copy-directly-from-azure-blob-storage-to-azure-data-lake.html">Copy directly from azure blob storage to azure data lake.</a></h1>
 <footer class="post-info">
         <abbr class="published" title="2018-09-26T15:26:00+02:00">
                 Published: Wed 26 September 2018
@@ -211,10 +27,45 @@
         </address>
 <p>In <a href="/category/python.html">Python</a>.</p>
 <p>tags: <a href="/tag/azure.html">Azure</a> <a href="/tag/python.html">python</a> </p>
-</footer><!-- /.post-info -->                <p>Copy direct from blob storage to data lake</p>
-                <a class="readmore" href="/copy-directly-from-azure-blob-storage-to-azure-data-lake.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
+</footer><!-- /.post-info --><p>A cool snippet copying files directly from azure blob storage to azure data lake.</p>
+<p>Neither the Azure Data Lake client nor the Azure Storage client allows for directly copying files between these two systems even if they are used in parallell.  However, combining the possibility to get a stream from the blob, and the open file function from azure data lake we can copy the blob without downloading it first.</p>
+<p>First, get the blob client:</p>
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">azure.storage.blob</span> <span class="kn">import</span> <span class="n">BlockBlobService</span>
+
+<span class="n">container</span> <span class="o">=</span> <span class="s2">&quot;mycontainer&quot;</span>
+<span class="n">account_name</span> <span class="o">=</span> <span class="n">secrets</span><span class="p">[</span><span class="s2">&quot;blob_account_name&quot;</span><span class="p">]</span>
+<span class="n">account_key</span> <span class="o">=</span> <span class="n">secrets</span><span class="p">[</span><span class="s2">&quot;blob_key&quot;</span><span class="p">]</span>
+<span class="n">block_blob_service</span> <span class="o">=</span> <span class="n">BlockBlobService</span><span class="p">(</span><span class="n">account_name</span><span class="p">,</span> <span class="n">account_key</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Then, get the data lake client:</p>
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">azure.datalake.store</span> <span class="kn">import</span> <span class="n">core</span><span class="p">,</span> <span class="n">lib</span>
+
+<span class="n">tenant</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">secrets</span><span class="p">[</span><span class="s2">&quot;tenant&quot;</span><span class="p">]</span>
+<span class="n">resource</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">secrets</span><span class="p">[</span><span class="s2">&quot;datalakeresource&quot;</span><span class="p">]</span>
+<span class="n">client_id</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">secrets</span><span class="p">[</span><span class="s2">&quot;datalakeclientid&quot;</span><span class="p">]</span>
+<span class="n">client_secret</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">secrets</span><span class="p">[</span><span class="s2">&quot;datalakeclientsecret&quot;</span><span class="p">]</span>
+
+<span class="n">credentials</span> <span class="o">=</span> <span class="n">lib</span><span class="o">.</span><span class="n">auth</span><span class="p">(</span><span class="n">tenant_id</span><span class="o">=</span><span class="n">tenant</span><span class="p">,</span>
+                    <span class="n">client_secret</span><span class="o">=</span><span class="n">client_secret</span><span class="p">,</span>
+                    <span class="n">client_id</span><span class="o">=</span><span class="n">client_id</span><span class="p">,</span>
+                    <span class="n">resource</span><span class="o">=</span><span class="n">resource</span><span class="p">)</span>
+
+<span class="n">adlfsClient</span>  <span class="o">=</span>  <span class="n">core</span><span class="o">.</span><span class="n">AzureDLFileSystem</span><span class="p">(</span><span class="n">credentials</span><span class="p">,</span> <span class="n">store_name</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">secrets</span><span class="p">[</span><span class="s2">&quot;datalakestorename&quot;</span><span class="p">])</span>
+</pre></div>
+
+
+<p>Now, we can create the following useful function:</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">copy_blob_to_lake</span><span class="p">(</span><span class="n">adlfsClient</span><span class="p">,</span> <span class="n">block_blob_service</span><span class="p">,</span> <span class="n">blob_name</span><span class="p">,</span><span class="n">lake_path</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">adlfsClient</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">lake_path</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="nb">file</span><span class="p">:</span>
+        <span class="n">block_blob_service</span><span class="o">.</span><span class="n">get_blob_to_stream</span><span class="p">(</span><span class="n">container_name</span><span class="o">=</span><span class="n">container</span><span class="p">,</span> <span class="n">blob_name</span><span class="o">=</span><span class="n">blob_name</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="nb">file</span><span class="p">,</span> <span class="n">max_connections</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
 
             <li><article class="hentry">
                 <header>
@@ -235,6 +86,54 @@
 <p>tags: <a href="/tag/python.html">python</a> <a href="/tag/project-euler.html">Project Euler</a> </p>
 </footer><!-- /.post-info -->                <p>Solutions to project Euler #1</p>
                 <a class="readmore" href="/project-euler-1.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/first-look-performance-and-cython.html" rel="bookmark"
+                           title="Permalink to First look: Performance and cython">First look: Performance and cython</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2018-08-21T00:00:00+02:00">
+                Published: Tue 21 August 2018
+        </abbr>
+		<br />
+        <abbr class="modified" title="2018-11-16T00:00:00+01:00">
+                Updated: Fri 16 November 2018
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/john-erik-sloper.html">John Erik Sloper</a>
+        </address>
+<p>In <a href="/category/python.html">Python</a>.</p>
+<p>tags: <a href="/tag/python.html">python</a> <a href="/tag/cython.html">cython</a> <a href="/tag/performance.html">performance</a> </p>
+</footer><!-- /.post-info -->                <p>First attempt at using cython to improve performance</p>
+                <a class="readmore" href="/first-look-performance-and-cython.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/speeding-up-rolling-pandas.html" rel="bookmark"
+                           title="Permalink to Speeding up rolling pandas">Speeding up rolling pandas</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2018-08-15T00:00:00+02:00">
+                Published: Wed 15 August 2018
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/john-erik-sloper.html">John Erik Sloper</a>
+        </address>
+<p>In <a href="/category/python.html">Python</a>.</p>
+<p>tags: <a href="/tag/python.html">python</a> <a href="/tag/pandas.html">pandas</a> </p>
+</footer><!-- /.post-info -->                <p>Using numpy to speed up pandas rolling</p>
+                <a class="readmore" href="/speeding-up-rolling-pandas.html">read more</a>
                 </div><!-- /.entry-content -->
             </article></li>
                 </ol><!-- /#posts-list -->
