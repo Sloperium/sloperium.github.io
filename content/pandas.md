@@ -1,5 +1,5 @@
 Title: Speeding up rolling pandas
-Date: 2018-11-16 
+Date: 2018-08-15 
 Category: Python
 Tags: python, pandas
 Authors: John Erik Sloper

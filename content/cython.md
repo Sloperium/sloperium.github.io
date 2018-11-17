@@ -1,5 +1,5 @@
 Title: First look: Performance and cython
-Date: 2018-11-16
+Date: 2018-08-21
 Modified: 2018-11-16 
 Category: Python
 Tags: python, cython, performance
