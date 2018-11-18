@@ -32,10 +32,12 @@ SOCIAL = (('You can add links in your config file', '#'),
 
 DEFAULT_PAGINATION = 10
 
+MARKUP = ('md','ipynb')
+
 STATIC_PATHS = ['images', 'extra']
 
 PLUGIN_PATHS = ['plugins']
-PLUGINS = ['render_math']
+PLUGINS = ['render_math','ipynb.markup']
 
 EXTRA_PATH_METADATA = {
     'extra/favicon.ico': {'path': 'favicon.ico'},
