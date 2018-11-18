@@ -79,13 +79,13 @@ Length: 1000000, dtype: float64
 <p>Let's check again, but with a different calculation:</p>
 <div class="highlight"><pre><span></span><span class="n">s</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10</span><span class="o">**</span><span class="mi">6</span><span class="p">))</span>
 <span class="o">%</span><span class="n">timeit</span> <span class="n">s</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-<span class="o">%</span><span class="n">timeit</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">rolling_window</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">/</span><span class="n">pre</span><span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">rolling_window</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
 </pre></div>
 
 
 <p>output:</p>
 <div class="highlight"><pre><span></span>52.5 ms ± 1.73 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
-14.9 ms ± 129 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)&amp;lt;/pre&amp;gt;
+14.9 ms ± 129 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)&lt;/pre&gt;
 </pre></div>
 
 
