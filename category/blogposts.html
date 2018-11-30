@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
         <meta charset="utf-8" />
-        <title>Calculating the last digits of large fibonacci numbers</title>
+        <title>Sloperium - Blogposts</title>
         <link rel="stylesheet" href="/theme/css/main.css" />
 </head>
 
@@ -10,18 +10,14 @@
         <header id="banner" class="body">
                 <h1><a href="/">Sloperium </a></h1>
                 <nav><ul>
-                    <li class="active"><a href="/category/python.html">Python</a></li>
+                    <li class="active"><a href="/category/blogposts.html">Blogposts</a></li>
+                    <li><a href="/category/python.html">Python</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
-<section id="content" class="body">
-  <article>
-    <header>
-      <h1 class="entry-title">
-        <a href="/calculating-the-last-digits-of-large-fibonacci-numbers.html" rel="bookmark"
-           title="Permalink to Calculating the last digits of large fibonacci numbers">Calculating the last digits of large fibonacci numbers</a></h1>
-    </header>
 
-    <div class="entry-content">
+            <aside id="featured" class="body">
+                <article>
+                    <h1 class="entry-title"><a href="/calculating-the-last-digits-of-large-fibonacci-numbers.html">Calculating the last digits of large fibonacci numbers</a></h1>
 <footer class="post-info">
         <abbr class="published" title="2018-09-08T00:00:00+02:00">
                 Published: Sat 08 September 2018
@@ -30,10 +26,9 @@
         <address class="vcard author">
                 By                         <a class="url fn" href="/author/christian-sloper.html">Christian Sloper</a>
         </address>
-<p>In <a href="/category/python.html">Python</a>.</p>
+<p>In <a href="/category/blogposts.html">Blogposts</a>.</p>
 <p>tags: <a href="/tag/python.html">python</a> <a href="/tag/math.html">math</a> </p>
-</footer><!-- /.post-info -->      <p>Fibonacci numbers occur many places in science, in nature and especially in programming puzzles.  They are easy 
-to understand, and easy to implement, poorly. In this blog post I will show the naive way, the "standard" way, and in the end a sub-linear algorithm for calculating the nth Fibonacci number that allows for calculating huge Fibonacci numbers very quickly.</p>
+</footer><!-- /.post-info --><p>Fibonacci numbers occur many places in science, in nature and especially in programming puzzles.  They are easy to understand, and easy to implement, poorly. In this blog post I will show the naive way, the "standard" way, and in the end a sub-linear algorithm for calculating the nth Fibonacci number that allows for calculating huge Fibonacci numbers very quickly.</p>
 <h1>Definition of Fibonacci</h1>
 <p>Each Fibonacci number is defined as the sum of the two previous Fibonacci numbers.  Formally <span class="math">\( F_n = F_{n-1} + F_{n-2}\)</span> where <span class="math">\( F_0 = 0\)</span> and <span class="math">\( F_1 = 1\)</span>.</p>
 <p>The sequence is then : <span class="math">\( 0,1,1,2,3,5,8,13,21, ...\)</span></p>
@@ -63,7 +58,7 @@ to understand, and easy to implement, poorly. In this blog post I will show the 
 
 
 <p>This allows for calculating much larger fibonacci numbers like 
-<span class="math">\( fib2(1000,10^{16}) = 7795166849228875\)</span>
+<span class="math">\( fib2(1000,10**16) = 7795166849228875\)</span>
 (the full number is )
 fib(1000) = 43466557686937456435688527675040625802564660517371780402481729089536555417949051890403879840079255169295922593080322634775209689623239873322471161642996440906533187938298969649928516003704476137795166849228875</p>
 <p>but we (in python) will run into maximum recursion depth.  Even without recursion depth it runs in <span class="math">\( \mathcal{O}(n)\)</span> time, but also in <span class="math">\( \mathcal{O}(n)\)</span> space.</p>
@@ -77,6 +72,7 @@ fib(1000) = 43466557686937456435688527675040625802564660517371780402481729089536
 
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
         <span class="n">f1</span><span class="p">,</span><span class="n">f2</span> <span class="o">=</span> <span class="n">f2</span><span class="p">,</span> <span class="p">(</span><span class="n">f1</span><span class="o">+</span><span class="n">f2</span><span class="p">)</span><span class="o">%</span><span class="n">mod</span>
+        <span class="n">n</span><span class="o">-=</span><span class="mi">1</span>
     <span class="k">return</span> <span class="n">f2</span>
 </pre></div>
 
@@ -109,7 +105,7 @@ fib(1000) = 43466557686937456435688527675040625802564660517371780402481729089536
 </pre></div>
 
 
-<p>This is now sublinear <span class="math">\( \mathcal{O}(\log n)\)</span> and calculates the last 16 digits of a trillion, trillion (<span class="math">\(10^{24}\)</span>) in about 200ns.</p>
+<p>This is now sublinear <span class="math">\( \mathcal{O}(\log n)\)</span> and calculates the last 16 digits of a trillion, trillion (<span class="math">\(10^24\)</span>) in about 200ns.</p>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
         indent = "0em",
@@ -164,11 +160,8 @@ fib(1000) = 43466557686937456435688527675040625802564660517371780402481729089536
         "}";
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
-</script>
-    </div><!-- /.entry-content -->
-
-  </article>
-</section>
+</script>                </article>
+            </aside><!-- /#featured -->
         <section id="extras" class="body">
                 <div class="blogroll">
                         <h2>links</h2>
