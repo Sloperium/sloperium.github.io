@@ -60,7 +60,6 @@ def fib3(n, mod):
 
     for i in range(n-1):
         f1,f2 = f2, (f1+f2)%mod
-        n-=1
     return f2
 ```
 
