@@ -106,3 +106,6 @@ output/
 
 # vscode
 .vscode/
+
+# datafiles
+content/datafiles/
