@@ -1006,7 +1006,8 @@ h6:hover .anchor-link {
 <div class="text_cell_render border-box-sizing rendered_html">
 <h1 id="Advent-of-Code-calendar">Advent of Code calendar<a class="anchor-link" href="#Advent-of-Code-calendar">&#182;</a></h1><p>Solution to day 1 of Advent of Code
 <a href="https://adventofcode.com/2018/day/1">https://adventofcode.com/2018/day/1</a></p>
-<h2 id="Day-1-part-1">Day 1 part 1<a class="anchor-link" href="#Day-1-part-1">&#182;</a></h2>
+<h2 id="Day-1-part-1">Day 1 part 1<a class="anchor-link" href="#Day-1-part-1">&#182;</a></h2><p>Part one is simple list comprehension and sum:</p>
+
 </div>
 </div>
 </div>
@@ -1015,7 +1016,7 @@ h6:hover .anchor-link {
 <div class="prompt input_prompt">In&nbsp;[1]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;aoc1input.txt&#39;</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;datafiles/aoc1input.txt&#39;</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="nb">sum</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()]))</span>
 </pre></div>
 
@@ -1046,7 +1047,8 @@ h6:hover .anchor-link {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Day-1-part-2">Day 1 part 2<a class="anchor-link" href="#Day-1-part-2">&#182;</a></h2>
+<h2 id="Day-1-part-2">Day 1 part 2<a class="anchor-link" href="#Day-1-part-2">&#182;</a></h2><p>In part two we can make use of the interesting "cycle" iterator function, that repeats the elements of an iterator over and over.</p>
+
 </div>
 </div>
 </div>
@@ -1057,18 +1059,16 @@ h6:hover .anchor-link {
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">itertools</span> <span class="k">import</span> <span class="n">cycle</span>
 
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;aoc1input.txt&#39;</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-    <span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()]</span>
-
-    <span class="n">d</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="mi">0</span><span class="p">])</span>
-    <span class="n">v</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">cycle</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
-        <span class="n">v</span> <span class="o">+=</span> <span class="n">n</span>
-        <span class="k">if</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">d</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;datafiles/aoc1input.txt&#39;</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+    <span class="n">seen_frequencies</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">current_frequency</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">delta</span> <span class="ow">in</span> <span class="n">cycle</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">file</span><span class="o">.</span><span class="n">readlines</span><span class="p">()]):</span>
+        <span class="n">current_frequency</span> <span class="o">+=</span> <span class="n">delta</span>
+        <span class="k">if</span> <span class="n">current_frequency</span> <span class="ow">in</span> <span class="n">seen_frequencies</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">current_frequency</span><span class="p">)</span>
             <span class="k">break</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">d</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="n">seen_frequencies</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">current_frequency</span><span class="p">)</span>
 </pre></div>
 
 </div>
