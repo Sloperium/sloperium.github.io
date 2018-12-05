@@ -17,10 +17,10 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/advent-of-code-day-4.html">Advent of Code Day 4</a></h1>
+                    <h1 class="entry-title"><a href="/advent-of-code-day-5.html">Advent of Code Day 5</a></h1>
 <footer class="post-info">
-        <abbr class="published" title="2018-12-04T00:00:00+01:00">
-                Published: Tue 04 December 2018
+        <abbr class="published" title="2018-12-05T00:00:00+01:00">
+                Published: Wed 05 December 2018
         </abbr>
 
         <address class="vcard author">
@@ -1004,7 +1004,7 @@ h6:hover .anchor-link {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Day-4">Day 4<a class="anchor-link" href="#Day-4">&#182;</a></h1><p>Solution to day 4 of Advent of Code <a href="https://adventofcode.com/2018/day/4">https://adventofcode.com/2018/day/4</a></p>
+<h1 id="Day-5">Day 5<a class="anchor-link" href="#Day-5">&#182;</a></h1><p>Solution to day 5 of Advent of Code <a href="https://adventofcode.com/2018/day/5">https://adventofcode.com/2018/day/5</a></p>
 <h2 id="Data-preparation">Data preparation<a class="anchor-link" href="#Data-preparation">&#182;</a></h2><p>Since both part 1 and two use the same data, we create a function to read and prepare the data in the file:</p>
 
 </div>
@@ -1015,12 +1015,10 @@ h6:hover .anchor-link {
 <div class="prompt input_prompt">In&nbsp;[1]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span> 
-
-<span class="k">def</span> <span class="nf">read_file</span><span class="p">():</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;datafiles\aoc4input.txt&quot;</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">file</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
-    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">read_file</span><span class="p">():</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;datafiles\aoc5input.txt&quot;</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">line</span>
 </pre></div>
 
 </div>
@@ -1032,7 +1030,7 @@ h6:hover .anchor-link {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Part-1">Part 1<a class="anchor-link" href="#Part-1">&#182;</a></h2><p>Using numpy to handle the sleepy.</p>
+<h2 id="Part-1">Part 1<a class="anchor-link" href="#Part-1">&#182;</a></h2><p>Using deques</p>
 
 </div>
 </div>
@@ -1042,32 +1040,25 @@ h6:hover .anchor-link {
 <div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="n">guard</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="n">asleep</span> <span class="o">=</span> <span class="mi">0</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">deque</span>
 
-<span class="c1">#max guard number</span>
-<span class="n">guards</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">read_file</span><span class="p">():</span>
-    <span class="k">if</span> <span class="s1">&#39;begins shift&#39;</span> <span class="ow">in</span> <span class="n">i</span><span class="p">:</span>
-        <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;#\d+&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
-        <span class="n">guards</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]))</span>
+<span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="n">left</span><span class="p">,</span><span class="n">right</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">left</span> <span class="ow">and</span> <span class="n">left</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">right</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">left</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="n">right</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">part1</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="n">left</span> <span class="o">=</span> <span class="n">deque</span><span class="p">()</span>
+    <span class="n">right</span> <span class="o">=</span> <span class="n">deque</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="k">while</span> <span class="n">right</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">match</span><span class="p">(</span><span class="n">left</span><span class="p">,</span><span class="n">right</span><span class="p">):</span>
+            <span class="n">left</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="n">right</span><span class="o">.</span><span class="n">popleft</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">left</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">right</span><span class="o">.</span><span class="n">popleft</span><span class="p">())</span>
+
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">left</span><span class="p">)</span>
+
+<span class="n">part1</span><span class="p">(</span><span class="n">read_file</span><span class="p">())</span>
         
-<span class="n">sleep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">max</span><span class="p">(</span><span class="n">guards</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">60</span><span class="p">))</span>
-
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">read_file</span><span class="p">():</span>
-    <span class="k">if</span> <span class="s1">&#39;begins shift&#39;</span> <span class="ow">in</span> <span class="n">i</span><span class="p">:</span>
-        <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;#\d+&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
-        <span class="n">guard</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">()[</span><span class="mi">1</span><span class="p">:])</span>
-    <span class="k">if</span> <span class="s1">&#39;asleep&#39;</span> <span class="ow">in</span> <span class="n">i</span><span class="p">:</span>
-        <span class="n">asleep</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">15</span><span class="p">:</span><span class="mi">17</span><span class="p">])</span>
-    <span class="k">if</span> <span class="s1">&#39;wakes up&#39;</span> <span class="ow">in</span> <span class="n">i</span><span class="p">:</span>
-        <span class="n">sleep</span><span class="p">[</span><span class="n">guard</span><span class="p">,</span><span class="n">asleep</span><span class="p">:</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">15</span><span class="p">:</span><span class="mi">17</span><span class="p">])]</span> <span class="o">+=</span><span class="mi">1</span>
-
-<span class="n">sleepyguard</span> <span class="o">=</span>   <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">sleep</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>      
-        
-<span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">sleep</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">sleep</span><span class="p">[</span><span class="n">sleepyguard</span><span class="p">]))</span>
 </pre></div>
 
 </div>
@@ -1080,13 +1071,15 @@ h6:hover .anchor-link {
 
 <div class="output_area">
 
-<div class="prompt"></div>
+<div class="prompt output_prompt">Out[2]:</div>
 
 
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>3212
-</pre>
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>11546</pre>
 </div>
+
 </div>
 
 </div>
@@ -1097,7 +1090,7 @@ h6:hover .anchor-link {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Part-2">Part 2<a class="anchor-link" href="#Part-2">&#182;</a></h2><p>Continuing from above we can easily output the indices of the maximal element.</p>
+<h2 id="Part-2">Part 2<a class="anchor-link" href="#Part-2">&#182;</a></h2><p>Lets do part 1 26 times.</p>
 
 </div>
 </div>
@@ -1107,8 +1100,12 @@ h6:hover .anchor-link {
 <div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">sleep</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">),</span> <span class="n">sleep</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">ind</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">ind</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">string</span> <span class="k">import</span> <span class="n">ascii_lowercase</span>
+
+<span class="n">s</span> <span class="o">=</span> <span class="n">read_file</span><span class="p">()</span>
+
+<span class="nb">min</span><span class="p">([</span><span class="n">part1</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span><span class="s1">&#39;&#39;</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ascii_lowercase</span><span class="p">])</span>
+    
 </pre></div>
 
 </div>
@@ -1121,13 +1118,15 @@ h6:hover .anchor-link {
 
 <div class="output_area">
 
-<div class="prompt"></div>
+<div class="prompt output_prompt">Out[3]:</div>
 
 
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>4966
-</pre>
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>5124</pre>
 </div>
+
 </div>
 
 </div>
@@ -1171,6 +1170,40 @@ h6:hover .anchor-link {
                     <h1>Other articles</h1>
                     <hr />
                     <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/advent-of-code-day-4.html" rel="bookmark"
+                           title="Permalink to Advent of Code Day 4">Advent of Code Day 4</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2018-12-04T00:00:00+01:00">
+                Published: Tue 04 December 2018
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/christian-sloper.html">Christian Sloper</a>
+        </address>
+<p>In <a href="/category/advent-of-code.html">Advent of Code</a>.</p>
+<p>tags: <a href="/tag/python.html">python</a> <a href="/tag/jupyter.html">jupyter</a> </p>
+</footer><!-- /.post-info -->                
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Day-4">Day 4<a class="anchor-link" href="#Day-4">&#182;</a></h1><p>Solution to day 4 of Advent of Code <a href="https://adventofcode.com/2018/day/4">https://adventofcode.com/2018/day/4</a></p>
+<h2 id="Data-preparation">Data preparation<a class="anchor-link" href="#Data-preparation">&#182;</a></h2><p>Since both part 1 and two use the same data, we create a function to read and prepare the data in the file:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+                <a class="readmore" href="/advent-of-code-day-4.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
@@ -1400,32 +1433,6 @@ h6:hover .anchor-link {
 <p>tags: <a href="/tag/python.html">python</a> <a href="/tag/project-euler.html">Project Euler</a> </p>
 </footer><!-- /.post-info -->                <p>Solutions to project Euler #1</p>
                 <a class="readmore" href="/project-euler-1.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/first-look-performance-and-cython.html" rel="bookmark"
-                           title="Permalink to First look: Performance and cython">First look: Performance and cython</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2018-08-21T00:00:00+02:00">
-                Published: Tue 21 August 2018
-        </abbr>
-		<br />
-        <abbr class="modified" title="2018-11-16T00:00:00+01:00">
-                Updated: Fri 16 November 2018
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/john-erik-sloper.html">John Erik Sloper</a>
-        </address>
-<p>In <a href="/category/python.html">Python</a>.</p>
-<p>tags: <a href="/tag/python.html">python</a> <a href="/tag/cython.html">cython</a> <a href="/tag/performance.html">performance</a> </p>
-</footer><!-- /.post-info -->                <p>First attempt at using cython to improve performance</p>
-                <a class="readmore" href="/first-look-performance-and-cython.html">read more</a>
                 </div><!-- /.entry-content -->
             </article></li>
                 </ol><!-- /#posts-list -->
